@@ -12,7 +12,7 @@ with open('date.txt', 'r') as file:  #Date is pulled from "date.txt"
 base_date = datetime.strptime(base_date_str, '%m/%d/%Y')
 
 for file in txt_files:  #Iterates through all data files from "input"
-    input_file = pd.read_csv(file, delimiter=';', header=None)  #Input files are semicolon delimited
+    input_file = pd.read_csv(file, dtype=str, delimiter=';', header=None)  #Input files are semicolon delimited
     new_file = pd.DataFrame()
     new_file[0] = input_file[0]
     new_file.insert(1, 'noticedate', base_date.strftime('%m/%d/%Y'))  #Uses date from "date.txt"
@@ -23,6 +23,7 @@ for file in txt_files:  #Iterates through all data files from "input"
     new_file[5] = input_file[4]
     new_file[6] = input_file[5]
     new_file[7] = input_file[6]
+    new_file[7] = new_file[7].apply(lambda x: x.zfill(5) if len(x) < 5 else x)
     new_file.columns = ['docid', 'noticedate', 'responsedate', 'company', 'address', 'city', 'state', 'zip']  #Headers
     output_file = os.path.join("output", f"{os.path.splitext(os.path.basename(file))[0]}_cleaned.txt")  #Creates path
     new_file.to_csv(output_file, sep=';', index=False)  #Saves cleaned file
